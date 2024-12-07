@@ -4,7 +4,13 @@ if game.PlaceId == 16732694052 then
     local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
     -- Main
-    local Window = OrionLib:MakeWindow({Name = "VITIN HUB 1.01", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+    local Window = OrionLib:MakeWindow({
+        Name = "FEZZER HUB",
+        HidePremium = false,
+        SaveConfig = true,
+        ConfigFolder = "FEZZERHubConfig",
+        IntroText = "by Vitin Crezy e IT4LaC"
+    })
 
     -- Global settings
     _G.AutoCast = false
@@ -12,6 +18,7 @@ if game.PlaceId == 16732694052 then
     _G.InstatanicReel = false
     _G.FixMapBeta = false
     _G.RepairMapBeta = false
+    _G.AutoShake = false
 
     -- Function for AutoCast
     local function AutoCast()
@@ -29,7 +36,7 @@ if game.PlaceId == 16732694052 then
     local function AutoLancar()
         while _G.AutoLancar do
             local args = {
-                [1] = 94.60000000000014,
+                [1] = 94.6,  -- Valor ajustado para ponto flutuante
                 [2] = 1
             }
             local rod = game:GetService("Players").LocalPlayer.Character:FindFirstChild("Flimsy Rod")
@@ -53,6 +60,33 @@ if game.PlaceId == 16732694052 then
             game:GetService("ReplicatedStorage").events.reelfinished:FireServer(unpack(args))
             print("Instatanic Reel activated.")
             wait(1)  -- Adjust the frequency as needed
+        end
+    end
+
+    -- Function for AutoShake
+    local function AutoShake()
+        while _G.AutoShake do
+            task.wait()
+            xpcall(function()
+                local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+                local GuiService = game:GetService("GuiService")
+                local VirtualInputManager = game:GetService("VirtualInputManager")
+                
+                local shakeui = PlayerGui:FindFirstChild("shakeui")
+                if not shakeui then return end
+                local safezone = shakeui:FindFirstChild("safezone")
+                local button = safezone and safezone:FindFirstChild("button")
+                task.wait(0.2)
+                GuiService.SelectedObject = button
+                if GuiService.SelectedObject == button then
+                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+                end
+                task.wait(0.1)
+                GuiService.SelectedObject = nil
+            end, function(err)
+                warn(err)
+            end)
         end
     end
 
@@ -90,17 +124,17 @@ if game.PlaceId == 16732694052 then
     end
 
     -- Create Tabs and Toggles
-    local EquiprodTab = Window:MakeTab({
-        Name = "Equip rod",
+    local MainTab = Window:MakeTab({
+        Name = "Main",
         Icon = "rbxassetid://4483345998",
         PremiumOnly = false
     })
 
-    local AutoCastSection = EquiprodTab:AddSection({
+    local AutoCastSection = MainTab:AddSection({
         Name = "Auto-Cast"
     })
     
-    EquiprodTab:AddToggle({
+    MainTab:AddToggle({
         Name = "Auto-Cast",
         Default = false,
         Callback = function(Value)
@@ -111,11 +145,11 @@ if game.PlaceId == 16732694052 then
         end   
     })
 
-    local AutoLancarSection = EquiprodTab:AddSection({
+    local AutoLancarSection = MainTab:AddSection({
         Name = "Auto-Lancar"
     })
     
-    EquiprodTab:AddToggle({
+    MainTab:AddToggle({
         Name = "Auto-Lancar",
         Default = false,
         Callback = function(Value)
@@ -126,17 +160,32 @@ if game.PlaceId == 16732694052 then
         end    
     })
 
-    local InstatanicReelSection = EquiprodTab:AddSection({
+    local InstatanicReelSection = MainTab:AddSection({
         Name = "Instatanic Reel"
     })
     
-    EquiprodTab:AddToggle({
+    MainTab:AddToggle({
         Name = "Instatanic Reel",
         Default = false,
         Callback = function(Value)
             _G.InstatanicReel = Value
             if _G.InstatanicReel then
                 InstatanicReel()
+            end
+        end
+    })
+
+    local AutoShakeSection = MainTab:AddSection({
+        Name = "Auto Shake"
+    })
+
+    MainTab:AddToggle({
+        Name = "Auto Shake",
+        Default = false,
+        Callback = function(Value)
+            _G.AutoShake = Value
+            if _G.AutoShake then
+                AutoShake()
             end
         end
     })
@@ -229,7 +278,7 @@ if game.PlaceId == 16732694052 then
         end   
     })
 
-    IslandSection:AddButton({
+        IslandSection:AddButton({
         Name = "Forsaken Shores Dock",
         Callback = function()
             local islandPosition = Vector3.new(-2485, 133, 1562)
